@@ -48,6 +48,29 @@ structure before (see spec background). The dataset/table itself may also move.
   and `test_discovery.py` cover the mapping and payload shape and will catch
   most mismatches.
 
+## BigQuery access denied / permission error
+
+**Symptom:** Queries fail immediately with `accessDenied`, `403`, or a "user does
+not have permission" / "Permission bigquery.jobs.create denied" error.
+
+**Cause:** One of two independent things (see
+[`docs/setup-bigquery.md`](setup-bigquery.md)):
+- **`bigquery.jobs.create` denied** → your service account is missing the
+  **BigQuery Job User** role on *your own* project (`gcp.project_id`). This is the
+  one role you must grant; queries run and bill in your project.
+- **Read denied on `geodrops-prod.db_public`** → this is a GeoDrops-side grant, not
+  yours. The dataset is normally publicly readable, so a Job-User service account
+  can read it with no dataset grant. If read specifically is denied, GeoDrops has
+  changed how the dataset is shared — adding roles on *your* project cannot fix it.
+
+**Fix:**
+- Confirm the service account has **BigQuery Job User** on the project named in
+  `gcp.project_id`, and that `gcp.project_id` is *your* project, not `geodrops-prod`.
+- Confirm the BigQuery API is enabled on your project.
+- If only the data read is denied (job creation works), check the
+  [GeoDrops forum thread](https://geodrops.discourse.group/t/integrating-geodrops-soil-moisture-sensors-with-home-assistant/280)
+  for the current public-sharing status before touching your own IAM.
+
 ## MQTT authentication failure
 
 **Symptom:** Publish fails with an authentication/connection error; nothing
