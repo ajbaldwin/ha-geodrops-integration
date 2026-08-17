@@ -67,6 +67,10 @@ def main(argv=None) -> int:
     if args.once:
         try:
             client = make_client(config)
+        except Exception as exc:  # noqa: BLE001 - can't run without a client
+            _log.error("Failed to create BigQuery client: %s", exc)
+            return 1
+        try:
             run_once(config, client=client)
             return 0
         except Exception:  # noqa: BLE001
