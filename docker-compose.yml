@@ -1,0 +1,11 @@
+services:
+  geodrops-sync:
+    build: .
+    restart: unless-stopped
+    environment:
+      GEODROPS_MQTT_PASSWORD: ${GEODROPS_MQTT_PASSWORD:?set in .env}
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/service-account.json
+    volumes:
+      - ./config.yaml:/config/config.yaml:ro
+      - ./service-account.json:/secrets/service-account.json:ro
+    command: ["--config", "/config/config.yaml"]
