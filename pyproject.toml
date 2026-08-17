@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ha-geodrops-integration"
+version = "0.1.0"
+description = "Sync GeoDrops soil-moisture sensors from BigQuery to MQTT / Home Assistant."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "google-cloud-bigquery>=3.0",
+    "paho-mqtt>=1.6",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+geodrops-sync = "geodrops_sync.cli:main"
+
+[tool.setuptools]
+packages = ["geodrops_sync"]
