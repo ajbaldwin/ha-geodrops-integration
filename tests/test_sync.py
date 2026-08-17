@@ -57,3 +57,24 @@ def test_run_once_uses_injected_fetch():
     summary = run_once(cfg, fetch=lambda config, client: [_row(1001)],
                        publish=lambda m, c: None)
     assert summary.devices == 1
+
+
+def test_run_once_uses_default_fetch_with_real_client_seam():
+    """No `rows` and no `fetch` injected: exercises the real fetch_rows ->
+    client.query(sql) path that production (via cli.main) relies on."""
+    cfg = _cfg([DeviceConfig(1001, "AAA111", "zone_a")])
+
+    class FakeClient:
+        def __init__(self):
+            self.queries = []
+
+        def query(self, sql):
+            self.queries.append(sql)
+            return [_row(1001)]
+
+    fake_client = FakeClient()
+    summary = run_once(cfg, client=fake_client, publish=lambda m, c: None)
+
+    assert len(fake_client.queries) == 1
+    assert "FROM" in fake_client.queries[0]
+    assert summary.devices == 1 and summary.skipped == 0

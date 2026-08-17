@@ -6,6 +6,7 @@ import logging
 import signal
 import time
 
+from .bigquery_client import make_client
 from .config import load_config
 from .sync import run_once
 
@@ -35,13 +36,14 @@ def _install_signal_stop():
     return lambda: state["run"]
 
 
-def run_daemon(config, *, run=run_once, sleep=time.sleep, should_continue=None) -> int:
+def run_daemon(config, *, run=run_once, sleep=time.sleep, should_continue=None,
+                client=None) -> int:
     if should_continue is None:
         should_continue = _install_signal_stop()
     interval_seconds = config.sync.interval_minutes * 60
     while should_continue():
         try:
-            run(config)
+            run(config, client=client)
         except Exception:  # noqa: BLE001 - a bad cycle must not kill the daemon
             _log.exception("Sync cycle failed; will retry next interval")
         if should_continue():
@@ -64,12 +66,19 @@ def main(argv=None) -> int:
 
     if args.once:
         try:
-            run_once(config)
+            client = make_client(config)
+            run_once(config, client=client)
             return 0
         except Exception:  # noqa: BLE001
             _log.exception("Sync failed")
             return 1
-    return run_daemon(config)
+
+    try:
+        client = make_client(config)
+    except Exception as exc:  # noqa: BLE001 - a bad client must not enter the daemon loop
+        _log.error("Failed to create BigQuery client: %s", exc)
+        return 1
+    return run_daemon(config, client=client)
 
 
 if __name__ == "__main__":

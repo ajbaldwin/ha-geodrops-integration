@@ -1,6 +1,7 @@
 import logging
 
-from geodrops_sync.cli import build_parser, run_daemon
+from geodrops_sync import cli
+from geodrops_sync.cli import build_parser, main, run_daemon
 
 
 def test_parser_defaults_and_flags():
@@ -46,3 +47,40 @@ class _FakeConfig:
     def __init__(self, interval_minutes):
         from geodrops_sync.config import SyncConfig
         self.sync = SyncConfig(interval_minutes=interval_minutes)
+
+
+def test_main_once_threads_client_from_make_client(tmp_path, monkeypatch):
+    """main(['--once', ...]) must build a client via make_client() and pass
+    it into run_once - without this, a real run hits fetch_rows(config, None)
+    -> None.query(...) -> AttributeError. Hermetic: no google import, no
+    network - make_client and run_once are monkeypatched out."""
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        "gcp:\n"
+        "  project_id: proj\n"
+        "mqtt:\n"
+        "  host: 10.0.0.1\n"
+        "devices:\n"
+        "  - device_id: 1001\n"
+        "    mfg_sn: AAA111\n"
+        "    name: zone_a\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("GOOGLE_APPLICATION_CREDENTIALS", "/creds.json")
+
+    sentinel_client = object()
+    captured = {}
+
+    def fake_make_client(config):
+        return sentinel_client
+
+    def fake_run_once(config, *, client=None, **kwargs):
+        captured["client"] = client
+
+    monkeypatch.setattr(cli, "make_client", fake_make_client)
+    monkeypatch.setattr(cli, "run_once", fake_run_once)
+
+    rc = main(["--once", "--config", str(config_path)])
+
+    assert rc == 0
+    assert captured["client"] is sentinel_client
