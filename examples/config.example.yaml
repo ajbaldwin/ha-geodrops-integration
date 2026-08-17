@@ -1,0 +1,29 @@
+# Copy to ./config.yaml and edit. Secrets are NOT set here — they come from env:
+#   GEODROPS_MQTT_PASSWORD          MQTT broker password
+#   GOOGLE_APPLICATION_CREDENTIALS  path to your GCP service-account JSON key
+
+gcp:
+  project_id: your-gcp-project-id
+
+bigquery:
+  table: geodrops-prod.db_public.p_sensor_unified   # override if the dataset/schema changes
+  lookback_hours: 12
+
+mqtt:
+  host: 127.0.0.1
+  port: 1883
+  username: homeassistant
+  discovery_prefix: homeassistant   # must match your HA MQTT discovery prefix
+  topic_prefix: geodrops
+
+sync:
+  interval_minutes: 15
+  expire_after_minutes: 45
+  staleness_warn_hours: 6
+  staleness_skip_hours: 12
+
+# One entry per GeoDrops sensor. Find device_id / mfg_sn per docs/finding-device-ids.md.
+# `name` is used in entity IDs and MQTT topics — lowercase, underscores, stable.
+devices:
+  - { device_id: 1001, mfg_sn: "AAA111", name: zone_a }
+  - { device_id: 1002, mfg_sn: "AAA222", name: zone_b }
