@@ -64,3 +64,9 @@ def test_missing_mqtt_host():
     raw = {**BASE_RAW, "mqtt": {**BASE_RAW["mqtt"], "host": ""}}
     with pytest.raises(ConfigError, match="mqtt.host"):
         parse_config(raw, ENV)
+
+
+def test_non_integer_numeric_raises_configerror_naming_key():
+    raw = {**BASE_RAW, "sync": {"interval_minutes": "not-a-number"}}
+    with pytest.raises(ConfigError, match="sync.interval_minutes"):
+        parse_config(raw, ENV)

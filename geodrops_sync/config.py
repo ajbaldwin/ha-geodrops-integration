@@ -58,6 +58,14 @@ class Config:
     service_account_file: str
 
 
+def _int(value, key: str) -> int:
+    """Coerce a config value to int, raising ConfigError that names the key on failure."""
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise ConfigError(f"{key} must be an integer, got {value!r}") from exc
+
+
 def parse_config(raw: dict, env: Mapping[str, str]) -> Config:
     raw = raw or {}
 
@@ -68,7 +76,8 @@ def parse_config(raw: dict, env: Mapping[str, str]) -> Config:
     bq_raw = raw.get("bigquery") or {}
     bigquery = BigQueryConfig(
         table=bq_raw.get("table", BigQueryConfig().table),
-        lookback_hours=int(bq_raw.get("lookback_hours", BigQueryConfig().lookback_hours)),
+        lookback_hours=_int(bq_raw.get("lookback_hours", BigQueryConfig().lookback_hours),
+                            "bigquery.lookback_hours"),
     )
 
     mqtt_raw = raw.get("mqtt") or {}
@@ -83,7 +92,7 @@ def parse_config(raw: dict, env: Mapping[str, str]) -> Config:
         )
     mqtt = MqttConfig(
         host=host,
-        port=int(mqtt_raw.get("port", MqttConfig().port)),
+        port=_int(mqtt_raw.get("port", MqttConfig().port), "mqtt.port"),
         username=username,
         password=password,
         discovery_prefix=mqtt_raw.get("discovery_prefix", MqttConfig().discovery_prefix),
@@ -92,10 +101,14 @@ def parse_config(raw: dict, env: Mapping[str, str]) -> Config:
 
     sync_raw = raw.get("sync") or {}
     sync = SyncConfig(
-        interval_minutes=int(sync_raw.get("interval_minutes", SyncConfig().interval_minutes)),
-        expire_after_minutes=int(sync_raw.get("expire_after_minutes", SyncConfig().expire_after_minutes)),
-        staleness_warn_hours=int(sync_raw.get("staleness_warn_hours", SyncConfig().staleness_warn_hours)),
-        staleness_skip_hours=int(sync_raw.get("staleness_skip_hours", SyncConfig().staleness_skip_hours)),
+        interval_minutes=_int(sync_raw.get("interval_minutes", SyncConfig().interval_minutes),
+                              "sync.interval_minutes"),
+        expire_after_minutes=_int(sync_raw.get("expire_after_minutes", SyncConfig().expire_after_minutes),
+                                  "sync.expire_after_minutes"),
+        staleness_warn_hours=_int(sync_raw.get("staleness_warn_hours", SyncConfig().staleness_warn_hours),
+                                  "sync.staleness_warn_hours"),
+        staleness_skip_hours=_int(sync_raw.get("staleness_skip_hours", SyncConfig().staleness_skip_hours),
+                                  "sync.staleness_skip_hours"),
     )
 
     devices_raw = raw.get("devices") or []

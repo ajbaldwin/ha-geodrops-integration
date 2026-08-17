@@ -13,6 +13,7 @@ def test_qcn_maps():
     assert qcn_to_state(-1) == "Training"
     assert qcn_to_state(99) == "Unknown"
     assert qcn_to_icon(0) == "mdi:close-circle"
+    assert qcn_to_icon(99) == "mdi:help-circle"   # out-of-map fallback
     assert set(["Bad", "Poor", "Good", "Training", "Unknown"]) == set(QCN_OPTIONS)
 
 
@@ -20,7 +21,9 @@ def test_moisture_index_maps():
     assert moisture_index_to_state(5) == "Wet+"
     assert moisture_index_to_state(0) == "Dry"
     assert moisture_index_to_state(-1) == "Unknown"
+    assert moisture_index_to_state(99) == "Unknown"   # out-of-map fallback
     assert moisture_index_to_icon(5) == "mdi:water"
+    assert moisture_index_to_icon(99) == "mdi:help-circle"   # out-of-map fallback
     assert "Wet+" in MOISTURE_STATE_OPTIONS and "Dry" in MOISTURE_STATE_OPTIONS
 
 

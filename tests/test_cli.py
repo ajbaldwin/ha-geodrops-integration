@@ -1,5 +1,3 @@
-import logging
-
 from geodrops_sync import cli
 from geodrops_sync.cli import build_parser, main, run_daemon
 
@@ -7,7 +5,7 @@ from geodrops_sync.cli import build_parser, main, run_daemon
 def test_parser_defaults_and_flags():
     p = build_parser()
     ns = p.parse_args([])
-    assert ns.once is False and ns.config == "config.yaml"
+    assert ns.once is False and ns.config == "config.yaml" and ns.log_level == "INFO"
     ns2 = p.parse_args(["--once", "--config", "/x.yaml", "--log-level", "DEBUG"])
     assert ns2.once is True and ns2.config == "/x.yaml" and ns2.log_level == "DEBUG"
 

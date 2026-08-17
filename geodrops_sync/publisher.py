@@ -1,12 +1,10 @@
 """MQTT publisher. paho imported lazily so unit tests stay dependency-free."""
 from __future__ import annotations
 
-from typing import List
-
 from .config import MqttConfig
 
 
-def publish_messages(messages: List[dict], mqtt_cfg: MqttConfig, publish_multiple=None) -> None:
+def publish_messages(messages: list[dict], mqtt_cfg: MqttConfig, publish_multiple=None) -> None:
     if not messages:
         return
     if publish_multiple is None:
