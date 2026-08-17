@@ -89,6 +89,13 @@ it wasn't listening at publish time — you don't need to keep this service
 running continuously for HA to already know about the entities from the last
 cycle.
 
+State messages are published retained too, not just the discovery configs, so
+HA shows the last known value immediately after a reconnect instead of waiting
+for the next cycle. One consequence: if you reconfigure a device (rename it,
+change its topic prefix, etc.), the old retained state can linger on the old
+topic until something republishes or clears it — check for stale values on
+old topics after a reconfig.
+
 Each entity is also configured with an MQTT `expire_after` equal to
 `sync.expire_after_minutes * 60` seconds (default 45 minutes). If this service
 stops publishing for longer than that — daemon down, cron stopped, network

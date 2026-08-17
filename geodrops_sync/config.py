@@ -110,7 +110,7 @@ def parse_config(raw: dict, env: Mapping[str, str]) -> Config:
                 name=str(d["name"]),
             ))
         except (KeyError, TypeError, ValueError) as exc:
-            raise ConfigError(f"invalid device entry {d!r}: {exc}")
+            raise ConfigError(f"invalid device entry {d!r}: {exc}") from exc
 
     service_account_file = env.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
     if not service_account_file:

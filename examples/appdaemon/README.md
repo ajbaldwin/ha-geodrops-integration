@@ -43,7 +43,7 @@ Adjust the `config_path` in `apps.yaml` to point to your geodrops configuration 
 AppDaemon reads secrets from the process environment. The geodrops-integration core requires two environment variables:
 
 - **`GEODROPS_MQTT_PASSWORD`**: The MQTT broker password.
-- **`GOOGLE_APPLICATION_CREDENTIALS`**: Path to the Google Cloud service account JSON file, or the JSON itself (if your config uses JSON format).
+- **`GOOGLE_APPLICATION_CREDENTIALS`**: Path to the Google Cloud service account JSON file. This must be a filesystem path — the client loads credentials via `from_service_account_file`, which requires a path, not the inline JSON content.
 
 Set these in your AppDaemon environment:
 ```bash

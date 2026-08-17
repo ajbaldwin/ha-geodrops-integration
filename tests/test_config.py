@@ -58,3 +58,9 @@ def test_missing_mqtt_password_with_username_raises():
 def test_missing_credentials_env_raises():
     with pytest.raises(ConfigError, match="GOOGLE_APPLICATION_CREDENTIALS"):
         parse_config(BASE_RAW, {"GEODROPS_MQTT_PASSWORD": "pw"})
+
+
+def test_missing_mqtt_host():
+    raw = {**BASE_RAW, "mqtt": {**BASE_RAW["mqtt"], "host": ""}}
+    with pytest.raises(ConfigError, match="mqtt.host"):
+        parse_config(raw, ENV)
