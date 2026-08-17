@@ -1,0 +1,6 @@
+geodrops_sync:
+  module: geodrops_app
+  class: GeodropsSync
+  # AppDaemon reinstalls these on startup; alternatively install the package.
+  config_path: /config/geodrops/config.yaml
+  interval_minutes: 15
