@@ -18,6 +18,8 @@ GeoDrops → BigQuery ─▶ [ha-geodrops-integration] ─▶ MQTT broker ─▶
 
 ## Requirements
 
+- Python 3.9+ to run from source (`pip install .`). The Docker image bundles
+  Python 3.12, so running via Docker Compose needs no local Python.
 - A Google Cloud project with BigQuery access to the GeoDrops public dataset
   (`geodrops-prod.db_public`) — see [`docs/setup-bigquery.md`](docs/setup-bigquery.md).
 - An MQTT broker reachable from wherever this service runs.

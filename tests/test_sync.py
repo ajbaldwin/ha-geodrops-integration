@@ -25,15 +25,17 @@ def _row(device_id, sync_delay=3, qcn=2):
 
 def test_run_once_publishes_and_summarizes():
     cfg = _cfg([DeviceConfig(1001, "AAA111", "zone_a")])
-    published = {}
+    published = {"calls": 0}
 
     def fake_publish(messages, mqtt_cfg):
+        published["calls"] += 1
         published["messages"] = messages
 
     summary = run_once(cfg, rows=[_row(1001)], publish=fake_publish)
     assert isinstance(summary, SyncSummary)
     assert summary.devices == 1 and summary.skipped == 0
     assert summary.configs == 15 and summary.states == 15
+    assert published["calls"] == 1              # aggregated into a single publish
     assert len(published["messages"]) == 30
 
 

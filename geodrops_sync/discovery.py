@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-from typing import List, Tuple
 
 from .config import DeviceConfig, MqttConfig, SyncConfig
 from .transform import (
@@ -49,9 +48,11 @@ def _state_msg(mqtt_cfg, device, suffix, value) -> dict:
     }
 
 
-def _discovery_configs(device, reading, sync_cfg, mqtt_cfg) -> List[dict]:
+def _discovery_configs(device, reading, sync_cfg, mqtt_cfg) -> list[dict]:
+    device_block = _device_block(device)
+
     def cfg(suffix, fields):
-        return _config_msg(mqtt_cfg, sync_cfg, device, _device_block(device), suffix, fields)
+        return _config_msg(mqtt_cfg, sync_cfg, device, device_block, suffix, fields)
 
     moisture = {"unit_of_measurement": "%", "device_class": "moisture", "state_class": "measurement"}
     temp = {"unit_of_measurement": "°C", "device_class": "temperature", "state_class": "measurement"}
@@ -83,7 +84,7 @@ def _discovery_configs(device, reading, sync_cfg, mqtt_cfg) -> List[dict]:
     ]
 
 
-def _state_messages(device, reading, mqtt_cfg) -> List[dict]:
+def _state_messages(device, reading, mqtt_cfg) -> list[dict]:
     def st(suffix, value):
         return _state_msg(mqtt_cfg, device, suffix, value)
 
@@ -113,6 +114,6 @@ def _state_messages(device, reading, mqtt_cfg) -> List[dict]:
 
 def build_device_messages(
     device: DeviceConfig, reading: DeviceReading, sync_cfg: SyncConfig, mqtt_cfg: MqttConfig
-) -> Tuple[List[dict], List[dict]]:
+) -> tuple[list[dict], list[dict]]:
     return _discovery_configs(device, reading, sync_cfg, mqtt_cfg), \
         _state_messages(device, reading, mqtt_cfg)
