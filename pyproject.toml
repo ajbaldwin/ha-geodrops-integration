@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ha-geodrops-integration"
-version = "0.1.0"
+version = "0.5.0"
 description = "Sync GeoDrops soil-moisture sensors from BigQuery to MQTT / Home Assistant."
 readme = "README.md"
 requires-python = ">=3.9"
